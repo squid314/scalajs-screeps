@@ -3,6 +3,8 @@ package com.screeps.native
 import com.screeps.native.Constants._
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
+import scala.scalajs.js.|
 
 /**
  * If the spawn is in process of spawning a new creep, this object will contain the new creep’s information.
@@ -19,13 +21,21 @@ trait Spawning extends js.Object {
     val remainingTime: Int = js.native
 }
 
-/** TODO */
-case class SpawnOpts(
-                        // TODO
+/**
+ * An object with additional options for the spawning process.
+ *
+ * @param memory           Memory of the new creep; will be immediately stored into [[Memory.creeps]]`[name]`.
+ * @param energyStructures Array of spawns/extensions from which to draw energy for the spawning process. Structures will be used according to the array order.
+ * @param dryRun           If true, the operation will only check if it is possible to create a creep.
+ * @param directions       Set desired [[Direction]]s where the creep should move when spawned.
+ */
+@JSExportTopLevel("SpawnOptions")
+case class SpawnOptions(
+                        @JSExport memory: js.UndefOr[Memory.CreepMemory] = js.undefined,
+                        @JSExport energyStructures: js.UndefOr[js.Array[StructureSpawn | StructureExtension]] = js.undefined,
+                        @JSExport dryRun: js.UndefOr[Boolean] = js.undefined,
+                        @JSExport directions: js.UndefOr[js.Array[Int @@ Direction]] = js.undefined,
                     )
-//    extends js.Object
-{
-}
 
 /**
  * Spawn is your colony center. This structure can create, renew, and recycle creeps.
@@ -58,7 +68,52 @@ trait StructureSpawn extends OwnedStructureWithStorage {
      * If the spawn is in process of spawning a new creep, this object
      * will contain the new creep’s information, or null otherwise.
      */
-    val spawning: Spawning = js.native
+    val spawning: Spawning | Unit = js.native
+
+    /**
+     * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.
+     *
+     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements of the [[BodypartType]]s.
+     * @param name The name of a new creep. It must be a unique creep name, i.e. the [[Game.creeps]] object should not contain another creep with the same name (hash key).
+     * @param opts An object with additional options for the spawning process.
+     * @return One of [[Error.OK]], [[Error.NotOwner]], [[Error.NameExists]], [[Error.Busy]], [[Error.NotEnoughResources]], [[Error.InvalidArgs]], [[Error.RCLNotEnough]].
+     */
+    def spawnCreep(body: js.Array[String @@ BodypartType], name: String, opts: SpawnOptions = ???): Int @@ Error = js.native
+
+    /**
+     * Kill the creep and drop up to 100% of resources spent on its spawning and boosting depending on remaining life
+     * time. The target should be at adjacent square. Energy return is limited to 125 units per body part.
+     *
+     * @param target The target creep object
+     * @return The name of the new creep or one of the following:
+     *         OK - The operation has been scheduled successfully.
+     *         NotOwner - You are not the owner of the target creep.
+     *         InvalidTarget - The specified target object is not a creep
+     *         NotInRange - The target creep is too far away.
+     * @note CPU Cost: CONST
+     */
+    def recycleCreep(target: Creep): Int = js.native
+
+    /**
+     * Increase the remaining time to live of the target creep. The target should be at adjacent square. The spawn
+     * should not be busy with the spawning process. Each execution increases the creep's timer by amount of ticks
+     * according to this formula: {{{floor(600/body_size)}}}. Energy required for each execution is determined using this
+     * formula: {{{ceil(creep_cost/2.5/body_size)}}}. Renewing a creep removes all of its boosts.
+     *
+     * @param target The target creep object
+     * @return One of the following error codes:
+     *         [[Error.OK]] - The operation has been scheduled successfully.
+     *         [[Error.NotOwner]] - You are not the owner of this spawn.
+     *         [[Error.Busy]] - The spawn is spawning another creep.
+     *         [[Error.NotEnoughResources]] - The spawn does not have enough energy.
+     *         [[Error.InvalidTarget]] - The specified target object is not a creep.
+     *         [[Error.Full]] - The target creep's time to live timer is full.
+     *         [[Error.NotInRange]] - The target creep is too far away.
+     *         [[Error.RCLNotEnough]] - Your Room Controller level is insufficient to use this spawn.
+     * @note CPU Cost: CONST
+     */
+    def renewCreep(target: Creep): Int = js.native
+
 
     /**
      * Check if a creep can be created.
@@ -103,47 +158,4 @@ trait StructureSpawn extends OwnedStructureWithStorage {
      */
     @deprecated("use StructureSpawn.spawnCreep()", "Facade-screeps v??")
     def createCreep(body: js.Array[String @@ BodypartType], name: String = "", memory: js.Any = ???): js.Any = js.native
-
-    /**
-     * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.
-     *
-     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements of the [[BodypartType]]s.
-     * @param name The name of a new creep. It must be a unique creep name, i.e. the [[Game.creeps]] object should not contain another creep with the same name (hash key).
-     * @param opts
-     * @return
-     */
-    def spawnCreep(body: js.Array[String @@ BodypartType], name: String = "", opts: SpawnOpts = ???): Int @@ Error = js.native
-
-    /**
-     * Kill the creep and drop up to 100% of resources spent on its spawning and boosting depending
-     * on remaining life time. The target should be at adjacent square.
-     *
-     * @param target The target creep object
-     * @return The name of the new creep or one of the following:
-     *         OK - The operation has been scheduled successfully.
-     *         NotOwner - You are not the owner of the target creep.
-     *         InvalidTarget - The specified target object is not a creep
-     *         NotInRange - The target creep is too far away.
-     * @note CPU Cost: CONST
-     */
-    def recycleCreep(target: Creep): Int = js.native
-
-    /**
-     * Increase the remaining time to live of the target creep. The target should be at adjacent square. The spawn
-     * should not be busy with the spawning process. Each execution increases the creep's timer by amount of ticks
-     * according to this formula: floor(600/body_size). Energy required for each execution is determined using this
-     * formula: ceil(creep_cost/2.5/body_size). Renewing a creep removes all of its boosts.
-     *
-     * @param target The target creep object
-     * @return The name of the new creep or one of the following:
-     *         OK - The operation has been scheduled successfully.
-     *         NotOwner - You are not the owner of this spawn.
-     *         Busy - The spawn is spawning another creep.
-     *         NotEnoughResources - The spawn does not have enough energy.
-     *         InvalidTarget - The specified target object is not a creep.
-     *         Full - The target creep's time to live timer is full.
-     *         NotInRange - The target creep is too far away.
-     * @note CPU Cost: CONST
-     */
-    def renewCreep(target: Creep): Int = js.native
 }

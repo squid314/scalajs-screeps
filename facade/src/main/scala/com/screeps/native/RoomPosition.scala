@@ -185,7 +185,7 @@ trait RoomPosition extends js.Object {
      *                 filter object, function, string
      *                 Only the objects which pass the filter using the Lodash.filter method will be used.
      * @return The closest object if found, null otherwise
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      * @example {{{var target = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
      *         creep.moveTo(target);}}}
      * {{{var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
@@ -211,7 +211,7 @@ trait RoomPosition extends js.Object {
      *
      * @param objects An array of room's objects or RoomPosition objects that the search should be executed against.
      * @return The closest object if found, null otherwise
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      * @example {{{var target = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
      *         creep.moveTo(target);}}}
      * {{{var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
@@ -240,7 +240,7 @@ trait RoomPosition extends js.Object {
      *                filter object, function, string
      *                Only the objects which pass the filter using the Lodash.filter method will be used.
      * @return The closest object if found, null otherwise
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      * @example {{{var target = creep.pos.findClosestByRange(FIND_MY_SPAWNS);
      *         creep.moveTo(target);}}}
      * {{{var target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
@@ -270,7 +270,7 @@ trait RoomPosition extends js.Object {
      *                 filter object, function, string
      *                 Only the objects which pass the filter using the Lodash.filter method will be used.
      * @return The closest object if found, null otherwise
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      * @example {{{var target = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
      *         if(targets.length > 0) {
      *           creep.rangedAttack(targets[0]);
@@ -291,7 +291,7 @@ trait RoomPosition extends js.Object {
      * @param objects An array of room's objects or RoomPosition objects that the search should be executed against.
      * @param range   The range distance
      * @return The closest object if found, null otherwise
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      * @example {{{var target = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
      *         if(targets.length > 0) {
      *           creep.rangedAttack(targets[0]);
@@ -315,7 +315,7 @@ trait RoomPosition extends js.Object {
      *                filter object, function, string
      *                Only the objects which pass the filter using the Lodash.filter method will be used.
      * @return The closest object if found, null otherwise
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      * @example {{{var target = creep.pos.findInRange(FIND_HOSTILE_CREEPS, 3);
      *         if(targets.length > 0) {
      *           creep.rangedAttack(targets[0]);

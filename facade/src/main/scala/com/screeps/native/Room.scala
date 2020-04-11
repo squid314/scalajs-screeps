@@ -3,7 +3,7 @@ package com.screeps.native
 import com.screeps.native.Constants._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSGlobal
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSGlobal}
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.scalajs.js.|
 
@@ -58,7 +58,16 @@ object Room extends js.Object {
         def getRawBuffer(destinationArray: Uint8Array = ???): Short | Uint8Array = js.native
     }
 
+
 }
+
+/**
+ * Object with additional options for searches with [[FindType]].
+ *
+ * @param filter The result list will be filtered using the <a href="https://lodash.com/docs/3.10.1#filter">Lodash.filter</a> method.
+ */
+@JSExportTopLevel("FindOptions")
+case class FindOptions(@JSExport filter: ((Structure, Int) => Boolean) | (Structure => Boolean) | String | js.Dynamic)
 
 /**
  * An object representing the room in which your units and structures are in.
@@ -123,11 +132,23 @@ trait Room extends js.Object {
      * @param opts     An object with additional options:
      *                 filter object, function, string
      *                 The result list will be filtered using the Lodash.filter method.
-     * @return an array of objects found
-     * @note CPU Cost: AVERAGE
+     * @return an array of objects found (return type is based on find type)
+     * @note CPU Cost: MEDIUM
      */
     // TODO: Flesh out the opts type
-    def find(findType: Int, opts: js.Object = ???): js.Array[js.Object] = js.native
+    def find(findType: Int, opts: js.Object = js.native):
+    js.Array[RoomPosition] |
+        js.Array[Creep] |
+        js.Array[Source] |
+        js.Array[Resource] |
+        js.Array[Structure] |
+        js.Array[Flag] |
+        js.Array[StructureSpawn] |
+        js.Array[ConstructionSite] |
+        js.Array[Mineral] |
+        js.Array[Nuke] |
+        js.Array[Tombstone]
+    = js.native
 
     /**
      * Find the exit direction en route to another room.
@@ -187,7 +208,7 @@ trait Room extends js.Object {
      *             { type: 'terrain', terrain: 'swamp' }
      *           ]
      * }}}
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      */
     def lookAt(x: Int, y: Int): js.Array[js.Object] = js.native
 
@@ -203,7 +224,7 @@ trait Room extends js.Object {
      *             { type: 'terrain', terrain: 'swamp' }
      *           ]
      * }}}
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      */
     def lookAt(target: RoomPosition): js.Array[js.Object] = js.native
 
@@ -243,7 +264,7 @@ trait Room extends js.Object {
      *           {x: 6, y: 11, type: 'terrain', terrain: 'swamp'},
      *           {x: 7, y: 11, type: 'terrain', terrain: 'wall'}
      *         ]}}}
-     * @note CPU Cost: AVERAGE
+     * @note CPU Cost: MEDIUM
      */
     def lookAtArea(top: Int, left: Int, bottom: Int, right: Int, asArray: Boolean = false): js.Any = js.native
 
