@@ -31,5 +31,5 @@ lazy val upload = project
     .settings(common)
     .settings(
         libraryDependencies += "io.spray" %% "spray-json" % "1.3.5",
-        libraryDependencies += "org.scalaj" % "scalaj-http_2.13" % "2.4.2",
+        libraryDependencies += "org.scalaj" %% "scalaj-http" % "2.4.2",
     )
