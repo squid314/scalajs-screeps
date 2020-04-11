@@ -19,25 +19,18 @@ class TargetHarvest(
 /** This role is specifically one which mines [[com.screeps.native.Source]]s in a room. */
 object Miner extends Role {
     def run(creep: Creep): Unit = {
-        g.console.log("doing miner things")
         val targetHarvest = creep.memory.targetHarvest.asInstanceOf[UndefOr[TargetHarvest]]
-        g.console.log(s"targetHarvest: $targetHarvest")
 
         if (targetHarvest.isEmpty) {
             g.console.log("miner has nothing to do :(")
         } else for (target <- targetHarvest) {
             if (creep.pos.x != target.pos.x || creep.pos.y != target.pos.y) {
-                g.console.log("need to move to target position")
                 if (creep.pos.isNearTo(target.pos)) {
-                    g.console.log("i am near!!")
                     creep.move(creep.pos.getDirectionTo(target.pos.x, target.pos.y))
                 } else {
-                    g.console.log("i am far")
                     val err = creep.moveTo(target.pos.x, target.pos.y)
-                    g.console.log(s"error: $err   ${Error.values.find(_.id == err)}")
                 }
             } else {
-                g.console.log("miner is at source, need to mine")
                 for (constructionId <- target.constructionId) {
                     g.console.log(s"miner has construction id: $constructionId")
                     for (energy <- creep.store(ResourceType.Energy)) {

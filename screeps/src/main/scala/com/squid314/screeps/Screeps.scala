@@ -20,10 +20,8 @@ object Screeps {
         //g.console.log(s"forcing type usage: ${BodypartType.Carry} ${Bodyparts.Carry}")
         val s = Game.spawns("Spawn1")
 
-        g.console.log(s)
         if (s.store(ResourceType.Energy).getOrElse(0) >= 300) {
             val err = s.spawnCreep(js.Array(BodypartType.Work, BodypartType.Work, BodypartType.Carry, BodypartType.Move), "name", SpawnOptions(memory = literal(role = "miner")))
-            g.console.log(s"error: ${Error.values.find(_.id == err)}")
         }
 
         val origin = Game.rooms.values.head.getPositionAt(1, 2)
@@ -35,16 +33,13 @@ object Screeps {
             ))
 
         for (room <- Game.spawns.values.toList.map(_.room).distinct) {
-            g.console.log(s"owned room: $room")
             val filter: Structure => Boolean = (s: Structure) =>
                 s.structureType == StructureType.Spawn.name || s.structureType == StructureType.Extension.name
             for (struct: Structure <- room.find(FindType.MyStructures,
                 /*ugh*/ js.Dynamic.literal(filter = filter))
                 .asInstanceOf[js.Array[Structure]]) {
-                g.console.log(s"structure: $struct")
             }
             for (struct: Structure <- room.findMyStructures()) {
-                g.console.log(s"my structure: $struct")
             }
             // TODO assess economy of spawn room
         }
