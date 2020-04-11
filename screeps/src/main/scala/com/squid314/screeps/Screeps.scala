@@ -1,10 +1,11 @@
 package com.squid314.screeps
 
-import com.screeps.native._
 import com.screeps.native.Constants._
+import com.screeps.native._
+import com.squid314.screeps.roles.{Miner, Role}
 
 import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.Dynamic.{literal, global => g}
 import scala.scalajs.js.annotation.JSExportTopLevel
 
 object Screeps {
@@ -13,18 +14,16 @@ object Screeps {
         memoryMaintenance() // maybe this will become uncommon at some point
         executeUncommonTasks()
 
-        println(s"time: ${Game.time}")
-//        println(s"forcing type usage: ${BodypartType.Work} ${Bodyparts.Work}")
-//        println(s"forcing type usage: ${BodypartType.Move} ${Bodyparts.Move}")
-//        println(s"forcing type usage: ${BodypartType.Carry} ${Bodyparts.Carry}")
+        g.console.log(s"time: ${Game.time}")
+        //g.console.log(s"forcing type usage: ${BodypartType.Work} ${Bodyparts.Work}")
+        //g.console.log(s"forcing type usage: ${BodypartType.Move} ${Bodyparts.Move}")
+        //g.console.log(s"forcing type usage: ${BodypartType.Carry} ${Bodyparts.Carry}")
         val s = Game.spawns("Spawn1")
-        println(s)
+
+        g.console.log(s)
         if (s.store(ResourceType.Energy).getOrElse(0) >= 300) {
-            println("trying to spawn")
-            var foo: js.Array[String @@ BodypartType] = js.Array(BodypartType.Work.name, BodypartType.Work.name, BodypartType.Move.name, BodypartType.Carry.name)
-            val err = s.spawnCreep(foo)
-            println(s"error: ${Error.values.find(_.id == err)}")
-            println(foo)
+            val err = s.spawnCreep(js.Array(BodypartType.Work, BodypartType.Work, BodypartType.Carry, BodypartType.Move), "name", SpawnOptions(memory = literal(role = "miner")))
+            g.console.log(s"error: ${Error.values.find(_.id == err)}")
         }
 
         val origin = Game.rooms.values.head.getPositionAt(1, 2)
@@ -35,25 +34,47 @@ object Screeps {
                 maxOps = Some(400),
             ))
 
-        for ((name, spawn) <- Game.spawns) {
-            println(s"spawn: $name -> ${spawn.store(ResourceType.Energy)}")
-            // TODO assess economy of spawn
+        for (room <- Game.spawns.values.toList.map(_.room).distinct) {
+            g.console.log(s"owned room: $room")
+            val filter: Structure => Boolean = (s: Structure) =>
+                s.structureType == StructureType.Spawn.name || s.structureType == StructureType.Extension.name
+            for (struct: Structure <- room.find(FindType.MyStructures,
+                /*ugh*/ js.Dynamic.literal(filter = filter))
+                .asInstanceOf[js.Array[Structure]]) {
+                g.console.log(s"structure: $struct")
+            }
+            for (struct: Structure <- room.findMyStructures()) {
+                g.console.log(s"my structure: $struct")
+            }
+            // TODO assess economy of spawn room
         }
         for ((name, creep) <- Game.creeps) {
-            println(s"creep: $name -> $creep: ${creep.ticksToLive}")
+            if (creep.spawning)
+                g.console.log(s"creep: $name -> $creep: spawning")
+            else {
+                g.console.log(s"creep: $name -> $creep: ${creep.ticksToLive}")
+                if (creep.memory.hasOwnProperty("role").asInstanceOf[Boolean]) {
+                    roles.get(creep.memory.role.asInstanceOf[String])
+                        .foreach(_.run(creep))
+                }
+            }
         }
     }
 
     def executeUncommonTasks(): Unit = {
         val check = Game.time & 0xF
 
-        uncommonTasks.get(check)
-            .foreach(f => f())
+        uncommonTasks.drop(check).headOption
+            .foreach(_ ())
     }
 
-    val uncommonTasks: scala.collection.immutable.Map[Int, () => Unit] = scala.collection.immutable.Map(
-        0 -> repairScan,
-        1 -> marketeering,
+    val uncommonTasks: js.Array[() => Unit] = js.Array(
+        repairScan,
+        marketeering,
+    )
+
+    val roles: js.Dictionary[Role] = js.Dictionary(
+        "miner" -> Miner
     )
 
     def repairScan(): Unit = {
