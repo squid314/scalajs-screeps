@@ -6,6 +6,7 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.literal
 
 package object native {
+
     implicit class RoomOps(val room: Room) {
         @inline final def findStructures(opts: js.Object = literal()): js.Array[Structure] = room.find(FindType.Structures, opts).asInstanceOf[js.Array[Structure]]
 
@@ -13,4 +14,5 @@ package object native {
 
         @inline final def findHostileStructures(opts: js.Object = literal()): js.Array[Structure] = room.find(FindType.HostileStructures, opts).asInstanceOf[js.Array[Structure]]
     }
+
 }

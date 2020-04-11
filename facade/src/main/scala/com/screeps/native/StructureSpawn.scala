@@ -4,7 +4,7 @@ import com.screeps.native.Constants._
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
-import scala.scalajs.js.|
+import scala.scalajs.js.{UndefOr, |}
 
 /**
  * If the spawn is in process of spawning a new creep, this object will contain the new creep’s information.
@@ -31,11 +31,11 @@ trait Spawning extends js.Object {
  */
 @JSExportTopLevel("SpawnOptions")
 case class SpawnOptions(
-                        @JSExport memory: js.UndefOr[Memory.CreepMemory] = js.undefined,
-                        @JSExport energyStructures: js.UndefOr[js.Array[StructureSpawn | StructureExtension]] = js.undefined,
-                        @JSExport dryRun: js.UndefOr[Boolean] = js.undefined,
-                        @JSExport directions: js.UndefOr[js.Array[Int @@ Direction]] = js.undefined,
-                    )
+                           @JSExport memory: js.UndefOr[Memory.CreepMemory] = js.undefined,
+                           @JSExport energyStructures: js.UndefOr[js.Array[StructureSpawn | StructureExtension]] = js.undefined,
+                           @JSExport dryRun: js.UndefOr[Boolean] = js.undefined,
+                           @JSExport directions: js.UndefOr[js.Array[Int @@ Direction]] = js.undefined,
+                       )
 
 /**
  * Spawn is your colony center. This structure can create, renew, and recycle creeps.
@@ -68,7 +68,7 @@ trait StructureSpawn extends OwnedStructureWithStorage {
      * If the spawn is in process of spawning a new creep, this object
      * will contain the new creep’s information, or null otherwise.
      */
-    val spawning: Spawning | Unit = js.native
+    val spawning: UndefOr[Spawning] = js.native
 
     /**
      * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.

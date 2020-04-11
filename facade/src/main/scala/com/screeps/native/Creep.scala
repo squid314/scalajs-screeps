@@ -1,7 +1,9 @@
 package com.screeps.native
 
+import com.screeps.native.Constants._
+
 import scala.scalajs.js
-import scala.scalajs.js.|
+import scala.scalajs.js.UndefOr
 
 @js.native
 trait BodyPart extends js.Object {
@@ -76,7 +78,7 @@ trait Creep extends RoomObject {
     /** A [[Store]] object that contains the cargo of this creep. */
     val store: Store = js.native
     /** The remaining amount of game ticks after which the creep will die. Will be undefined if creep is still spawning. */
-    val ticksToLive: Int | Unit = js.native
+    val ticksToLive: UndefOr[Int @@ Ticks] = js.native
 
     /**
      * Attack another creep or structure in a short-ranged attack. Requires the ATTACK body part. If the target is

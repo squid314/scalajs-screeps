@@ -3,8 +3,8 @@ package com.screeps.native
 import com.screeps.native.Constants._
 
 import scala.scalajs.js
+import scala.scalajs.js.UndefOr
 import scala.scalajs.js.annotation.JSBracketAccess
-import scala.scalajs.js.|
 
 @js.native
 trait Owner extends js.Object {
@@ -38,22 +38,22 @@ trait Store extends js.Object {
      *
      * @return capacity number, or {{{null}}} in case of an invalid {{{resource}}} for this store type.
      */
-    def getCapacity(resource: String @@ ResourceType = ???): Int @@ ResourceAmount | Unit = js.native
+    def getCapacity(resource: String @@ ResourceType = ???): UndefOr[Int @@ ResourceAmount] = js.native
 
     /**
      * Returns free capacity for the store. For a limited store, it returns the capacity available for the specified resource if {{{resource}}} is defined and valid for this store.
      *
      * @return capacity number, or {{{null}}} in case of an invalid {{{resource}}} for this store type.
      */
-    def getFreeCapacity(resource: String @@ ResourceType = ???): Int @@ ResourceAmount | Unit = js.native
+    def getFreeCapacity(resource: String @@ ResourceType = ???): UndefOr[Int @@ ResourceAmount] = js.native
 
     /**
      * Returns the capacity used by the specified resource. For a general purpose store, it returns total used capacity if {{{resource}}} is undefined.
      *
      * @return capacity number, or {{{null}}} in case of an invalid {{{resource}}} for this store type.
      */
-    def getUsedCapacity(resource: String @@ ResourceType = ???): Int @@ ResourceAmount | Unit = js.native
+    def getUsedCapacity(resource: String @@ ResourceType = ???): UndefOr[Int @@ ResourceAmount] = js.native
 
     @JSBracketAccess
-    def apply(resource: String @@ ResourceType): Int @@ ResourceAmount | Unit = js.native
+    def apply(resource: String @@ ResourceType): UndefOr[Int @@ ResourceAmount] = js.native
 }

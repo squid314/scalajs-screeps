@@ -3,7 +3,7 @@ package com.screeps.native
 import com.screeps.native.Constants._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel, JSGlobal}
+import scala.scalajs.js.annotation._
 import scala.scalajs.js.typedarray.Uint8Array
 import scala.scalajs.js.|
 
