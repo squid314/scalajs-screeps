@@ -3,7 +3,7 @@ package com.screeps.native
 import com.screeps.native.Constants._
 
 import scala.scalajs.js
-import scala.scalajs.js.|
+import scala.scalajs.js.{UndefOr, |}
 
 /**
  * An object representing the specified position in the room. Every object in
@@ -204,7 +204,7 @@ trait RoomPosition extends js.Object {
      *         var closest = creep.pos.findClosestByRange(targets);}}}
      */
     // TODO: Flesh out the opts type
-    def findClosestByRange(findType: Int, opts: js.Object = ???): js.Object = js.native
+    def findClosestByRange[T <: js.Object](findType: Int, opts: FindOptions[T] = js.native): UndefOr[js.Object] = js.native
 
     /**
      * Find an object with the shortest linear distance from the given position.
@@ -283,7 +283,7 @@ trait RoomPosition extends js.Object {
      *         var closest = creep.pos.findInRange(targets, 3);}}}
      */
     // TODO: Flesh out the opts type
-    def findInRange(findType: Int, range: Int, opts: js.Object = ???): js.Object = js.native
+    def findInRange[T <: js.Object](findType: Int, range: Int, opts: FindOptions[T] = js.native): js.Object = js.native
 
     /**
      * Find all objects in the specified linear range.
@@ -491,5 +491,5 @@ trait RoomPosition extends js.Object {
      *
      * @return An array of objects of the given type at the specified position if found.
      */
-    def lookFor(lookType: String): js.Array[js.Object] = js.native
+    def lookFor(lookType: String @@ LookType): js.Array[js.Object] = js.native
 }

@@ -14,5 +14,5 @@ import scala.scalajs.js
  */
 @js.native
 trait StructureExtractor extends OwnedStructure {
-    val cooldown: Int @@ Ticks = js.native
+    val cooldown: Int = js.native
 }

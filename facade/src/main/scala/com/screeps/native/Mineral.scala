@@ -23,5 +23,5 @@ trait Mineral extends RoomObject {
     /** The density that this mineral deposit will be refilled to once [[ticksToRegeneration]] reaches 0. This is one of the [[Density]] constants. */
     val density: Int @@ Density = js.native
     /** The remaining time after which the source will be refilled. */
-    val ticksToRegeneration: Int @@ Ticks = js.native
+    val ticksToRegeneration: Int = js.native
 }

@@ -121,8 +121,8 @@ object Constants extends Tagging {
     object BodypartType extends Enumeration {
         private implicit def tagName(s: String): String @@ BodypartType = tag[BodypartType](s)
         private implicit def tagCost(i: Int): Int @@ ResourceAmount = tag[ResourceAmount](i)
-        private implicit def tagTicks(i: Int): Int @@ Ticks = tag[Ticks](i)
-        protected case class Val(name: String @@ BodypartType, cost: Int @@ ResourceAmount, maxLifetime: Int @@ Ticks = 1500) extends super.Val(name)
+        private implicit def tagTicks(i: Int): Int = tag[Ticks](i)
+        protected case class Val(name: String @@ BodypartType, cost: Int @@ ResourceAmount, maxLifetime: Int = 1500) extends super.Val(name)
         val Move          = Val("move", 50)
         val Work          = Val("work", 100)
         val Carry         = Val("carry", 50)
@@ -134,7 +134,7 @@ object Constants extends Tagging {
 
         implicit def name(v: Val): String @@ BodypartType = v.name
         implicit def cost(v: Val): Int @@ ResourceAmount = v.cost
-        implicit def maxLifetime(v: Val): Int @@ Ticks = v.maxLifetime
+        implicit def maxLifetime(v: Val): Int = v.maxLifetime
     }
     object Bodyparts {
         val Move: String @@ BodypartType = g.MOVE.asInstanceOf[String @@ BodypartType]
@@ -186,19 +186,19 @@ object Constants extends Tagging {
         private implicit def tagName(s: String): String @@ LookType = tag[LookType](s)
         protected case class Val(name: String @@ LookType) extends super.Val(name)
 
-        val Creeps            = Value("creep")
-        val Energy            = Value("energy")
-        val Resources         = Value("resource")
-        val Sources           = Value("source")
-        val Minerals          = Value("mineral")
-        val Structures        = Value("structure")
-        val Flags             = Value("flag")
-        val ConstructionSites = Value("constructionSite")
-        val Nukes             = Value("nuke")
-        val Terrain           = Value("terrain")
-        val Tombstones        = Value("tombstone")
-        val PowerCreeps       = Value("powerCreep")
-        val Ruins             = Value("ruin")
+        val Creeps            = Val("creep")
+        val Energy            = Val("energy")
+        val Resources         = Val("resource")
+        val Sources           = Val("source")
+        val Minerals          = Val("mineral")
+        val Structures        = Val("structure")
+        val Flags             = Val("flag")
+        val ConstructionSites = Val("constructionSite")
+        val Nukes             = Val("nuke")
+        val Terrain           = Val("terrain")
+        val Tombstones        = Val("tombstone")
+        val PowerCreeps       = Val("powerCreep")
+        val Ruins             = Val("ruin")
 
         implicit def name(v: Val): String @@ LookType = v.name
     }

@@ -12,5 +12,5 @@ trait Nuke extends RoomObject {
     /** The name of the room where this nuke has been launched from. */
     val launchRoomName: String = js.native
     /** The remaining landing time. */
-    val timeToLand: Int @@ Ticks = js.native
+    val timeToLand: Int = js.native
 }

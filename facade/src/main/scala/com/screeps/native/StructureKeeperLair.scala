@@ -13,5 +13,5 @@ import scala.scalajs.js
 @js.native
 trait StructureKeeperLair extends OwnedStructure {
     /** Time to spawning of the next Source Keeper. */
-    val ticksToSpawn: Int @@ Ticks = js.native;
+    val ticksToSpawn: Int = js.native;
 }

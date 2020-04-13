@@ -65,9 +65,24 @@ object Room extends js.Object {
  * Object with additional options for searches with [[FindType]].
  *
  * @param filter The result list will be filtered using the <a href="https://lodash.com/docs/3.10.1#filter">Lodash.filter</a> method.
+ * @note ugh, making type param co variant even though it shouldn't be so that i don't have to cast everywhere
  */
 @JSExportTopLevel("FindOptions")
-case class FindOptions(@JSExport filter: ((Structure, Int) => Boolean) | (Structure => Boolean) | String | js.Dynamic)
+class FindOptions[T <: js.Object](@JSExport val filter: FindOptions.Filter[T])
+
+object FindOptions {
+    type Filter[T] = ((T, Int) => Boolean) | (T => Boolean) | String | js.Dynamic
+
+    def apply[T <: js.Object](f: Filter[T]) = new FindOptions[T](f)
+
+    def apply[T <: js.Object](f: (T, Int) => Boolean): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
+
+    def apply[T <: js.Object](f: T => Boolean): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
+
+    def apply[T <: js.Object](f: String): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
+
+    def apply[T <: js.Object](f: js.Dynamic): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
+}
 
 /**
  * An object representing the room in which your units and structures are in.
@@ -83,7 +98,7 @@ trait Room extends js.Object {
     /** Total amount of energyCapacity of all spawns and extensions in the room. */
     val energyCapacityAvailable: Int = js.native
     /** A shorthand to Memory.rooms[room.name]. You can use it for quick access the room’s specific memory data object. */
-    val memory: js.Any = js.native
+    val memory: Memory.RoomMemory = js.native
     /** The game mode, one of: Simulation, Survival, World, Arena */
     val mode: String = js.native
     /** The name of the room */
