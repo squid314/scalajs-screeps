@@ -527,7 +527,7 @@ trait Creep extends RoomObject {
      *         NoBodypart - There are no CLAIM body parts in this creep’s body.
      * @note CPU Cost: CONST
      */
-    def reserveController(target: Structure): Int = js.native
+    def reserveController(target: StructureController): Int = js.native
 
     /**
      * Display a visual speech balloon above the creep with the specified message. The message will disappear
@@ -629,7 +629,7 @@ trait Creep extends RoomObject {
      *         NoBodypart - There are no WORK body parts in this creep’s body.
      * @note CPU Cost: CONST
      */
-    def upgradeController(target: Structure): Int = js.native
+    def upgradeController(target: StructureController): Int = js.native
 
     /**
      * Withdraw resources from a structure. The target has to be at adjacent square to the creep. Multiple creeps can
@@ -650,5 +650,5 @@ trait Creep extends RoomObject {
      *         InvalidArgs - The resource amount or type is incorrect
      * @note CPU Cost: CONST
      */
-    def withdraw(target: Structure, resourceType: String, amount: Int): Int = js.native
+    def withdraw(target: Structure, resourceType: String, amount: Int = js.native): Int = js.native
 }
