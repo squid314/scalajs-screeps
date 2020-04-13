@@ -31,12 +31,28 @@ object Miner extends Role {
                     val err = creep.moveTo(target.pos.x, target.pos.y)
                 }
             } else {
+                if (creep.store.getFreeCapacity().get > 0) {
+                    for (resource <- creep.pos.lookFor(LookType.Resources).asInstanceOf[js.Array[Resource]]) {
+                        creep.pickup(resource)
+                    }
+                }
+                if (target.containerId.isEmpty && target.constructionId.isEmpty) {
+                    // finished construction, need to find the constructed container
+                    g.console.log(s"miner look for nearby container")
+                    val cons = creep.pos.findInRange(FindType.Structures, 1, FindOptions(((s: Structure) => s.structureType == StructureType.Container).asInstanceOf[js.Object => Boolean])).asInstanceOf[js.Array[StructureContainer]]
+                    g.console.log(s"cons: $cons")
+                    for (container <- cons.headOption) {
+                        creep.memory.targetHarvest.containerId = container.id
+                        // TODO creep will waste one tick of not knowing where to put its load, and only when the container is constructed, maybe i don't care
+                        //target = new TargetHarvest(target.id, target.pos, container.id, js.undefined)
+                    }
+                }
                 for (constructionId <- target.constructionId) {
-                    g.console.log(s"miner has construction id: $constructionId")
                     for (energy <- creep.store(ResourceType.Energy)) {
                         // unboosted work body parts construct at 5 energy units per tick
                         // unboosted work body parts harvest at 2 energy units per tick
                         // these 2 conditions check if all of a build can be used or part of a harvest will be dropped
+                        // if so, it executes a build, otherwise it executes a harvest
                         val workParts = creep.getActiveBodyparts(BodypartType.Work)
                         if (energy >= workParts * 5 ||
                             creep.store.getFreeCapacity(ResourceType.Energy).get <= workParts * 2) {
@@ -44,6 +60,7 @@ object Miner extends Role {
                             val construction = Game.getObjectById(constructionId).asInstanceOf[ConstructionSite]
                             val err = creep.build(construction)
                             g.console.log(s"error: $err   ${Error.values.find(_.id == err)}")
+                            // TODO if we finished, the id changes, hooray!
                             if (construction.progressTotal - construction.progress < Math.min(workParts * 5, energy)) {
                                 g.console.log("finished construction, does the object id change between the construction site and the real container?")
                                 creep.memory.targetHarvest = new TargetHarvest(target.id, target.pos, target.constructionId, js.undefined)

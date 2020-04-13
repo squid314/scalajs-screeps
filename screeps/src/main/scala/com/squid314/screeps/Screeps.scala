@@ -2,6 +2,7 @@ package com.squid314.screeps
 
 import com.screeps.native.Constants._
 import com.screeps.native._
+import com.squid314.screeps.economy.Assessment
 import com.squid314.screeps.roles.{Miner, Role}
 
 import scala.scalajs.js
@@ -20,9 +21,9 @@ object Screeps {
         //g.console.log(s"forcing type usage: ${BodypartType.Carry} ${Bodyparts.Carry}")
         val s = Game.spawns("Spawn1")
 
-        if (s.store(ResourceType.Energy).getOrElse(0) >= 300) {
-            val err = s.spawnCreep(js.Array(BodypartType.Work, BodypartType.Work, BodypartType.Carry, BodypartType.Move), "name", SpawnOptions(memory = literal(role = "miner")))
-        }
+        //if (s.store(ResourceType.Energy).getOrElse(0) >= 300) {
+        //    val err = s.spawnCreep(js.Array(BodypartType.Work, BodypartType.Work, BodypartType.Carry, BodypartType.Move), "name", SpawnOptions(memory = literal(role = "miner")))
+        //}
 
         val origin = Game.rooms.values.head.getPositionAt(1, 2)
         PathFinder.search(origin,
@@ -35,13 +36,14 @@ object Screeps {
         for (room <- Game.spawns.values.toList.map(_.room).distinct) {
             val filter: Structure => Boolean = (s: Structure) =>
                 s.structureType == StructureType.Spawn.name || s.structureType == StructureType.Extension.name
-            for (struct: Structure <- room.find(FindType.MyStructures,
-                /*ugh*/ js.Dynamic.literal(filter = filter))
-                .asInstanceOf[js.Array[Structure]]) {
-            }
+//            for (struct: Structure <- room.find(FindType.MyStructures,
+//                /*ugh*/ js.Dynamic.literal(filter = filter))
+//                .asInstanceOf[js.Array[Structure]]) {
+//            }
             for (struct: Structure <- room.findMyStructures()) {
+                g.console.log(s"my structure: $struct")
             }
-            // TODO assess economy of spawn room
+            Assessment(room)
         }
         for ((name, creep) <- Game.creeps) {
             if (creep.spawning)
