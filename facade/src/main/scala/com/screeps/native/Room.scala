@@ -62,7 +62,7 @@ object Room extends js.Object {
 }
 
 /**
- * Object with additional options for searches with [[FindType]].
+ * Object with additional options for searches with [[Find]].
  *
  * @param filter The result list will be filtered using the <a href="https://lodash.com/docs/3.10.1#filter">Lodash.filter</a> method.
  * @note ugh, making type param co variant even though it shouldn't be so that i don't have to cast everywhere
@@ -92,7 +92,7 @@ object FindOptions {
 @js.native
 trait Room extends js.Object {
     /** The Controller structure of this room, if present, otherwise undefined. */
-    val controller: StructureController = js.native
+    val controller: js.UndefOr[StructureController] = js.native
     /** Total amount of energy available in all spawns and extensions in the room. */
     val energyAvailable: Int = js.native
     /** Total amount of energyCapacity of all spawns and extensions in the room. */
@@ -104,9 +104,9 @@ trait Room extends js.Object {
     /** The name of the room */
     val name: String = js.native
     /** The Storage structure of this room, if present, otherwise undefined. */
-    val storage: StructureStorage = js.native
+    val storage: js.UndefOr[StructureStorage] = js.native
     /** The Terminal structure of this room, if present, otherwise undefined. */
-    val terminal: StructureTerminal = js.native
+    val terminal: js.UndefOr[StructureTerminal] = js.native
 
     /**
      * Create new ConstructionSite at the specified location.
@@ -151,7 +151,7 @@ trait Room extends js.Object {
      * @note CPU Cost: MEDIUM
      */
     // TODO: Flesh out the opts type
-    def find(findType: Int, opts: js.Object = js.native):
+    def find[T <: js.Object](findType: Int, opts: FindOptions[T] = js.native):
     js.Array[RoomPosition] |
         js.Array[Creep] |
         js.Array[Source] |

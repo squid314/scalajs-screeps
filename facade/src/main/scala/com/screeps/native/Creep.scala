@@ -3,10 +3,11 @@ package com.screeps.native
 import com.screeps.native.Constants._
 
 import scala.scalajs.js
-import scala.scalajs.js.UndefOr
+import scala.scalajs.js._
 
+/** This is an unnamed object type identified in the API at [[Creep.body]]. */
 @js.native
-trait BodyPart extends js.Object {
+trait BodypartDesc extends js.Object {
     /**
      * If the body part is boosted, this property specifies the mineral type which is used for boosting.
      * One of the RESOURCE_* constants. [[http://support.screeps.com/hc/en-us/articles/207891075 Learn more]]
@@ -43,7 +44,7 @@ trait BodyPart extends js.Object {
 @js.native
 trait Creep extends RoomObject {
     /** An array describing the creep’s body. */
-    val body: js.Array[BodyPart] = js.native
+    val body: js.Array[BodypartDesc] = js.native
     /** An alias for [[store]]. */
     @deprecated("storage was genericized, use store", "Facade-screeps v??")
     val carry: js.Dictionary[Int] = js.native
@@ -222,7 +223,7 @@ trait Creep extends RoomObject {
      * @return A number representing the quantity of body parts.
      * @note CPU Cost: NONE
      */
-    def getActiveBodyparts(partType: String): Int = js.native
+    def getActiveBodyparts(partType: String @@ Bodypart): Int = js.native
 
     /**
      * Harvest energy from the source or minerals from the mineral deposit. Requires the WORK body part.

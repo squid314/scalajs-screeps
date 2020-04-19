@@ -73,12 +73,12 @@ trait StructureSpawn extends OwnedStructureWithStorage {
     /**
      * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.
      *
-     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements of the [[BodypartType]]s.
+     * @param body An array describing the new creep’s body. Should contain 1 to 50 elements of the [[Bodypart]]s.
      * @param name The name of a new creep. It must be a unique creep name, i.e. the [[Game.creeps]] object should not contain another creep with the same name (hash key).
      * @param opts An object with additional options for the spawning process.
      * @return One of [[Error.OK]], [[Error.NotOwner]], [[Error.NameExists]], [[Error.Busy]], [[Error.NotEnoughResources]], [[Error.InvalidArgs]], [[Error.RCLNotEnough]].
      */
-    def spawnCreep(body: js.Array[String @@ BodypartType], name: String, opts: SpawnOptions = ???): Int @@ Error = js.native
+    def spawnCreep(body: js.Array[String @@ Bodypart], name: String, opts: SpawnOptions = ???): Int @@ Error = js.native
 
     /**
      * Kill the creep and drop up to 100% of resources spent on its spawning and boosting depending on remaining life
@@ -157,5 +157,5 @@ trait StructureSpawn extends OwnedStructureWithStorage {
      * @deprecated use [[spawnCreep()]]
      */
     @deprecated("use StructureSpawn.spawnCreep()", "Facade-screeps v??")
-    def createCreep(body: js.Array[String @@ BodypartType], name: String = "", memory: js.Any = ???): js.Any = js.native
+    def createCreep(body: js.Array[String @@ Bodypart], name: String = "", memory: js.Any = ???): js.Any = js.native
 }

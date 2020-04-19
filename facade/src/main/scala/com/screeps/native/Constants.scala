@@ -18,7 +18,8 @@ object Constants extends Tagging {
 
     sealed trait Direction
     object Direction extends Enumeration {
-        private implicit def tagId(i: Int) = tag[Direction](i)
+        private implicit def tagId(i: Int): Int @@ Direction = tag[Direction](i)
+        type Value = Val
         protected case class Val(name: String, i: Int @@ Direction = nextId) extends super.Val(i, name) {
             override def id: Int @@ Direction = i
         }
@@ -31,12 +32,13 @@ object Constants extends Tagging {
         val Left        = Val("Left")
         val TopLeft     = Val("TopLeft")
 
-        implicit def name(v: Value): Int @@ Direction = v.id
+        @inline implicit def name(v: Value): Int @@ Direction = v.id
     }
 
     sealed trait Error
     object Error extends Enumeration {
         private implicit def tagError[T](t: T): T @@ Error = tag[Error](t)
+        type Value = Val
         protected case class Val(i: Int @@ Error, name: String) extends super.Val(i, name) {
             override def id: Int @@ Error = i
         }
@@ -68,6 +70,7 @@ object Constants extends Tagging {
     object StructureType extends Enumeration {
         private implicit def tagName(s: String): String @@ StructureType = tag[StructureType](s)
         private implicit def tagCost(c: Int): Int @@ ResourceAmount = tag[ResourceAmount](c)
+        type Value = Val
         protected case class Val(name: String @@ StructureType, cost: Int @@ ResourceAmount = 0) extends super.Val(name) {
             def constructable: Boolean = cost != 0
         }
@@ -94,13 +97,14 @@ object Constants extends Tagging {
         val Factory     = Val("factory",         100_000)
         val InvaderCore = Val("invaderCore")
 
-        implicit def name(v: Val): String @@ StructureType = v.name
-        implicit def cost(v: Val): Int @@ ResourceAmount = v.cost
+        @inline implicit def name(v: Val): String @@ StructureType = v.name
+        @inline implicit def cost(v: Val): Int @@ ResourceAmount = v.cost
     }
 
     sealed trait Color
     object Color extends Enumeration {
         private implicit def tagColor[T](t: T): T @@ Color = tag[Color](t)
+        type Value = Val
         protected case class Val(name: String @@ Color) extends super.Val(name)
         val Red    = Val("red")
         val Purple = Val("purple")
@@ -113,16 +117,17 @@ object Constants extends Tagging {
         val Grey   = Val("grey")
         val White  = Val("white")
 
-        implicit def id(v: Val): Int @@ Color = v.id
-        implicit def name(v: Val): String @@ Color = v.name
+        @inline implicit def id(v: Val): Int @@ Color = v.id
+        @inline implicit def name(v: Val): String @@ Color = v.name
     }
 
-    sealed trait BodypartType
-    object BodypartType extends Enumeration {
-        private implicit def tagName(s: String): String @@ BodypartType = tag[BodypartType](s)
+    sealed trait Bodypart
+    object Bodypart extends Enumeration {
+        private implicit def tagName(s: String): String @@ Bodypart = tag[Bodypart](s)
         private implicit def tagCost(i: Int): Int @@ ResourceAmount = tag[ResourceAmount](i)
         private implicit def tagTicks(i: Int): Int = tag[Ticks](i)
-        protected case class Val(name: String @@ BodypartType, cost: Int @@ ResourceAmount, maxLifetime: Int = 1500) extends super.Val(name)
+        type Value = Val
+        protected case class Val(name: String @@ Bodypart, cost: Int @@ ResourceAmount, maxLifetime: Int = 1500) extends super.Val(name)
         val Move          = Val("move", 50)
         val Work          = Val("work", 100)
         val Carry         = Val("carry", 50)
@@ -132,21 +137,17 @@ object Constants extends Tagging {
         val Heal          = Val("heal", 250)
         val Claim         = Val("claim", 600, 600)
 
-        implicit def name(v: Val): String @@ BodypartType = v.name
-        implicit def cost(v: Val): Int @@ ResourceAmount = v.cost
-        implicit def maxLifetime(v: Val): Int = v.maxLifetime
-    }
-    object Bodyparts {
-        val Move: String @@ BodypartType = g.MOVE.asInstanceOf[String @@ BodypartType]
-        val Work: String @@ BodypartType = g.WORK.asInstanceOf[String @@ BodypartType]
-        val Carry: String @@ BodypartType = g.CARRY.asInstanceOf[String @@ BodypartType]
+        @inline implicit def name(v: Val): String @@ Bodypart = v.name
+        @inline implicit def cost(v: Val): Int @@ ResourceAmount = v.cost
+        @inline implicit def maxLifetime(v: Val): Int = v.maxLifetime
     }
 
-    sealed trait FindType
-    object FindType extends Enumeration {
-        private implicit def tagId(i: Int): Int @@ FindType = tag[FindType](i)
-        private implicit def tagName(name: String): String @@ FindType = tag[FindType](name)
-        protected case class Val(i: Int @@ FindType, name: String @@ FindType) extends super.Val(i, name)
+    sealed trait Find
+    object Find extends Enumeration {
+        private implicit def tagId(i: Int): Int @@ Find = tag[Find](i)
+        private implicit def tagName(name: String): String @@ Find = tag[Find](name)
+        type Value = Val
+        protected case class Val(i: Int @@ Find, name: String @@ Find) extends super.Val(i, name)
 
         val ExitTop                  = Val(Direction.Top.id, "EXIT_TOP")
         val ExitRight                = Val(Direction.Right.id, "EXIT_RIGHT")
@@ -177,14 +178,15 @@ object Constants extends Tagging {
         val Deposits                 = Val(122, "FIND_DEPOSITS")
         val Ruins                    = Val(123, "FIND_RUINS")
 
-        implicit def id(v: Val): Int @@ FindType = v.i
-        implicit def name(v: Val): String @@ FindType = v.name
+        @inline implicit def id(v: Val): Int @@ Find = v.i
+        @inline implicit def name(v: Val): String @@ Find = v.name
     }
 
-    sealed trait LookType
-    object LookType extends Enumeration {
-        private implicit def tagName(s: String): String @@ LookType = tag[LookType](s)
-        protected case class Val(name: String @@ LookType) extends super.Val(name)
+    sealed trait Look
+    object Look extends Enumeration {
+        private implicit def tagName(s: String): String @@ Look = tag[Look](s)
+        type Value = Val
+        protected case class Val(name: String @@ Look) extends super.Val(name)
 
         val Creeps            = Val("creep")
         val Energy            = Val("energy")
@@ -200,12 +202,13 @@ object Constants extends Tagging {
         val PowerCreeps       = Val("powerCreep")
         val Ruins             = Val("ruin")
 
-        implicit def name(v: Val): String @@ LookType = v.name
+        @inline implicit def name(v: Val): String @@ Look = v.name
     }
 
     sealed trait ResourceType
     object ResourceType extends Enumeration {
         private implicit def tagName(s: String): String @@ ResourceType = tag[ResourceType](s)
+        type Value = Val
         protected case class Val(name: String @@ ResourceType) extends super.Val(name)
         val Energy = Val("energy")
         val Power  = Val("power")
@@ -256,13 +259,14 @@ object Constants extends Tagging {
         val CatalyzedGhodiumAcid       = Val("XGH2O")
         val CatalyzedGhodiumAlkalide   = Val("XGHO2")
 
-        implicit def name(v: Val): String @@ ResourceType = v.name
+        @inline implicit def name(v: Val): String @@ ResourceType = v.name
     }
 
     sealed trait Density
     object Density extends Enumeration {
         private implicit def tagDensity[A](a: A): A @@ Density = tag[Density](a)
         private implicit def tagAmount[A](a: A): A @@ ResourceAmount = tag[ResourceAmount](a)
+        type Value = Val
         // name is not used in game, but enumeration likes it better to be explicit
         protected case class Val(i: Int @@ Density, name: String @@ Density, amount: Int @@ ResourceAmount, probability: Float) extends super.Val(i, name)
 
@@ -271,7 +275,7 @@ object Constants extends Tagging {
         val High = Val(3, "High", 70000, 0.4F)
         val Ultra = Val(4, "Ultra", 100000, 0.1F)
 
-        implicit def density(v: Val): Int @@ Density = v.i
-        implicit def amount(v: Val): Int @@ ResourceAmount = v.amount
+        @inline implicit def density(v: Val): Int @@ Density = v.i
+        @inline implicit def amount(v: Val): Int @@ ResourceAmount = v.amount
     }
 }

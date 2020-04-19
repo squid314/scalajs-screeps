@@ -5,7 +5,7 @@ import com.screeps.native.Constants._
 import scala.scalajs.js
 
 /**
- * A mineral deposit. Can be harvested by creeps with a [[BodypartType.Work]] using the extractor structure.
+ * A mineral deposit. Can be harvested by creeps with a [[Bodypart.Work]] using the extractor structure.
  * Learn more about minerals from [[https://docs.screeps.com/resources.html this article]].
  *
  * Regeneration amount    140-280K for Hydrogen and Oxygen

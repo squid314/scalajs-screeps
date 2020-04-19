@@ -123,7 +123,7 @@ object Game extends js.Object {
      *         var source = Game.getObjectById(creep.memory.sourceId);
      * }}}
      */
-    def getObjectById(id: String): js.Object = js.native
+    def getObjectById(id: String): js.UndefOr[js.Object] = js.native
 
     /**
      * Send a custom message at your profile email. This way, you can set up notifications to yourself on any occasion

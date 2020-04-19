@@ -3,6 +3,7 @@ package com.screeps.native
 import com.screeps.native.Constants._
 
 import scala.scalajs.js
+import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.{UndefOr, |}
 
 /**
@@ -12,13 +13,14 @@ import scala.scalajs.js.{UndefOr, |}
  * using the constructor.
  */
 @js.native
-trait RoomPosition extends js.Object {
+@JSGlobal
+class RoomPosition(val x: Int, val y: Int, val roomName: String) extends js.Object {
     /** The name of the room. */
-    val roomName: String = js.native
+//    val roomName: String = js.native
     /** X position in the room */
-    val x: Int = js.native
+//    val x: Int = js.native
     /** Y position in the room */
-    val y: Int = js.native
+//    val y: Int = js.native
 
     /**
      * Create new ConstructionSite at the specified location.
@@ -96,7 +98,7 @@ trait RoomPosition extends js.Object {
      *         var closest = creep.pos.findClosestByPath(targets);}}}
      */
     // TODO: Flesh out the opts type
-    def findClosestByPath(target: FindType | js.Array[RoomObject | RoomPosition], opts: js.Object = ???): js.Object = js.native
+    def findClosestByPath(target: Find | js.Array[RoomObject | RoomPosition], opts: js.Object = ???): js.Object = js.native
 
     /**
      * Find an object with the shortest path from the given position. Uses
@@ -204,7 +206,7 @@ trait RoomPosition extends js.Object {
      *         var closest = creep.pos.findClosestByRange(targets);}}}
      */
     // TODO: Flesh out the opts type
-    def findClosestByRange[T <: js.Object](findType: Int, opts: FindOptions[T] = js.native): UndefOr[js.Object] = js.native
+    def findClosestByRange[T <: js.Object](findType: Int @@ Find, opts: FindOptions[T] = js.native): UndefOr[js.Object] = js.native
 
     /**
      * Find an object with the shortest linear distance from the given position.
@@ -491,5 +493,5 @@ trait RoomPosition extends js.Object {
      *
      * @return An array of objects of the given type at the specified position if found.
      */
-    def lookFor(lookType: String @@ LookType): js.Array[js.Object] = js.native
+    def lookFor(lookType: String @@ Look): js.Array[js.Object] = js.native
 }

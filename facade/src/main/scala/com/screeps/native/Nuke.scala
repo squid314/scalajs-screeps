@@ -4,7 +4,7 @@ import com.screeps.native.Constants._
 
 import scala.scalajs.js
 
-/** A nuke landing position. This object cannot be removed or modified. You can [[Room.find]] incoming nukes in the room [[FindType.Nukes]]. */
+/** A nuke landing position. This object cannot be removed or modified. You can [[Room.find]] incoming nukes in the room [[Find.Nukes]]. */
 @js.native
 trait Nuke extends RoomObject {
     /** A unique object identifier. You can use [[Game.getObjectById]] method to retrieve an object instance by its `id`. */
