@@ -9,7 +9,6 @@ import spray.json._
 import scala.io.Source
 import scala.util.Using.resource
 
-
 case class Creds(accountAlias: String, token: String, ptr: Boolean)
 
 /** main class to upload the generated file */
