@@ -21,11 +21,16 @@ lazy val facade = project
     .settings(common)
     .settings(name := "scalajs-screeps")
     .enablePlugins(ScalaJSPlugin)
+lazy val macros = project
+    .settings(common)
+    .settings(name := "screeps-reflect")
+    .settings(libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value)
+    .dependsOn(facade)
 lazy val screeps = project
     .settings(common)
     .settings(name := "screeps")
     .enablePlugins(ScalaJSPlugin)
-    .dependsOn(facade)
+    .dependsOn(facade, macros)
 
 lazy val upload = project
     .settings(common)
@@ -33,3 +38,6 @@ lazy val upload = project
         libraryDependencies += "io.spray" %% "spray-json" % "1.3.5",
         libraryDependencies += "org.scalaj" %% "scalaj-http" % "2.4.2",
     )
+
+lazy val root = project.in(file("."))
+    .aggregate(facade, macros, screeps, upload)
