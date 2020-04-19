@@ -1,5 +1,6 @@
 package com.squid314.screeps.economy
 
+import com.screeps.native.Constants.{Find, StructureType}
 import com.screeps.native._
 
 import scala.scalajs.js
@@ -15,7 +16,11 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
  * @param state    the broad strokes state.
  */
 @JSExportTopLevel("Assessment")
-case class Assessment(@JSExport age: Int, @JSExport reassess: Int, @JSExport state: Assessment.State.Value)
+case class Assessment(
+                         @JSExport age: Int,
+                         @JSExport reassess: Int,
+                         @JSExport state: Assessment.State.Value
+                     )
 
 object Assessment {
 
@@ -31,12 +36,21 @@ object Assessment {
     def apply(room: Room): Assessment = {
         g.console.log("assessing room")
         val existing = fromDynamic(room.memory)
-                .filter(a => a.reassess > Game.time)
+            .filter(a => a.reassess > Game.time)
         if (existing.isDefined) {
             g.console.log("using existing assessment")
             existing.get
         } else {
             // TODO everything is "fledgling" right now
+/*
+            val filter: Structure => Boolean = (s: Structure) =>
+                s.structureType == StructureType.Spawn.name || s.structureType == StructureType.Extension.name
+            for (struct: Structure <- room.find(FindType.MyStructures,
+                /*ugh*/ js.Dynamic.literal(filter = filter))
+                .asInstanceOf[js.Array[Structure]]) {
+            }
+*/
+
             val assessment = new Assessment(Game.time, Game.time + 1000, State.Fledgling)
             room.memory.assessment = toDynamic(assessment)
             assessment

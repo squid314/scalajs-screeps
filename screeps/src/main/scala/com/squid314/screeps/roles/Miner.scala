@@ -32,19 +32,39 @@ object Miner extends Role {
                 }
             } else {
                 if (creep.store.getFreeCapacity().get > 0) {
-                    for (resource <- creep.pos.lookFor(LookType.Resources).asInstanceOf[js.Array[Resource]]) {
+                    for (resource <- creep.pos.lookFor(Look.Resources).asInstanceOf[js.Array[Resource]]) {
                         creep.pickup(resource)
                     }
                 }
+                val isContainer = ((s: Structure) => s.structureType == StructureType.Container).asInstanceOf[js.Object => Boolean]
+/*
+                val newContainer: UndefOr[StructureContainer] = for {
+                    constructionId <- target.constructionId
+                } yield if (Game.getObjectById(constructionId).isDefined) null
+                else creep.pos.findInRange(FindType.Structures, 1, FindOptions(isContainer))
+                    .asInstanceOf[js.Array[StructureContainer]]
+                    .headOption.orNull // we'll see if `null` will count as undefined for UndefOr[
+*/
                 if (target.containerId.isEmpty && target.constructionId.isEmpty) {
                     // finished construction, need to find the constructed container
                     g.console.log(s"miner look for nearby container")
-                    val cons = creep.pos.findInRange(FindType.Structures, 1, FindOptions(((s: Structure) => s.structureType == StructureType.Container).asInstanceOf[js.Object => Boolean])).asInstanceOf[js.Array[StructureContainer]]
-                    g.console.log(s"cons: $cons")
-                    for (container <- cons.headOption) {
+                    val cons = creep.pos.findInRange(Find.Structures, 1, FindOptions(isContainer)).asInstanceOf[js.Array[StructureContainer]]
+                    g.console.log(s"containers: $cons")
+                    if (!cons.isEmpty) for (container <- cons.headOption) {
                         creep.memory.targetHarvest.containerId = container.id
                         // TODO creep will waste one tick of not knowing where to put its load, and only when the container is constructed, maybe i don't care
                         //target = new TargetHarvest(target.id, target.pos, container.id, js.undefined)
+                    } else {
+                        val filter = ((s: ConstructionSite) => s.structureType == StructureType.Container).asInstanceOf[js.Object => Boolean]
+                        val cons = creep.pos.findInRange(Find.ConstructionSites, 1, FindOptions(filter)).asInstanceOf[js.Array[StructureContainer]]
+                        g.console.log(s"constructions: $cons")
+                        if (!cons.isEmpty) for (construction <- cons.headOption) {
+                            creep.memory.targetHarvest.constructionId = construction.id
+                        } else {
+                            g.console.log("no construction or containers around, just mine")
+                            val err = creep.harvest(Game.getObjectById(target.id).asInstanceOf[Source])
+                            g.console.log(s"error: $err  ${Error.values.find(_.id == err)}")
+                        }
                     }
                 }
                 for (constructionId <- target.constructionId) {
@@ -53,7 +73,7 @@ object Miner extends Role {
                         // unboosted work body parts harvest at 2 energy units per tick
                         // these 2 conditions check if all of a build can be used or part of a harvest will be dropped
                         // if so, it executes a build, otherwise it executes a harvest
-                        val workParts = creep.getActiveBodyparts(BodypartType.Work)
+                        val workParts = creep.getActiveBodyparts(Bodypart.Work)
                         if (energy >= workParts * 5 ||
                             creep.store.getFreeCapacity(ResourceType.Energy).get <= workParts * 2) {
                             g.console.log("miner has energy, will construct container")
@@ -61,13 +81,14 @@ object Miner extends Role {
                             val err = creep.build(construction)
                             g.console.log(s"error: $err   ${Error.values.find(_.id == err)}")
                             // TODO if we finished, the id changes, hooray!
+                            // TODO double hooray, if 2 miners work a single can (first tier), then this trigger doesn't work
                             if (construction.progressTotal - construction.progress < Math.min(workParts * 5, energy)) {
                                 g.console.log("finished construction, does the object id change between the construction site and the real container?")
                                 creep.memory.targetHarvest = new TargetHarvest(target.id, target.pos, target.constructionId, js.undefined)
                             }
                         } else {
                             g.console.log("miner needs energy, will harvest")
-                            val err = creep.harvest(Game.getObjectById(target.id).asInstanceOf[Source])
+                            val err = creep.harvest(Game.getObjectById(target.id).orNull.asInstanceOf[Source])
                             g.console.log(s"error: $err   ${Error.values.find(_.id == err)}")
                         }
                     }
