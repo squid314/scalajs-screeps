@@ -57,31 +57,6 @@ object Room extends js.Object {
         /** Expermiental API, return may be adjusted or function deprecated at any time. */
         def getRawBuffer(destinationArray: Uint8Array = ???): Short | Uint8Array = js.native
     }
-
-
-}
-
-/**
- * Object with additional options for searches with [[Find]].
- *
- * @param filter The result list will be filtered using the <a href="https://lodash.com/docs/3.10.1#filter">Lodash.filter</a> method.
- * @note ugh, making type param co variant even though it shouldn't be so that i don't have to cast everywhere
- */
-@JSExportTopLevel("FindOptions")
-class FindOptions[T <: js.Object](@JSExport val filter: FindOptions.Filter[T])
-
-object FindOptions {
-    type Filter[T] = ((T, Int) => Boolean) | (T => Boolean) | String | js.Dynamic
-
-    def apply[T <: js.Object](f: Filter[T]) = new FindOptions[T](f)
-
-    def apply[T <: js.Object](f: (T, Int) => Boolean): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
-
-    def apply[T <: js.Object](f: T => Boolean): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
-
-    def apply[T <: js.Object](f: String): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
-
-    def apply[T <: js.Object](f: js.Dynamic): FindOptions[T] = apply(f.asInstanceOf[Filter[T]])
 }
 
 /**
@@ -150,8 +125,7 @@ trait Room extends js.Object {
      * @return an array of objects found (return type is based on find type)
      * @note CPU Cost: MEDIUM
      */
-    // TODO: Flesh out the opts type
-    def find[T <: js.Object](findType: Int, opts: FindOptions[T] = js.native):
+    def find[T <: js.Object](findType: Int, opts: js.Object @@ FindOptions = js.native):
     js.Array[RoomPosition] |
         js.Array[Creep] |
         js.Array[Source] |
@@ -198,7 +172,7 @@ trait Room extends js.Object {
      * @return An array with path steps
      * @note CPU Cost HIGH
      */
-    def findPath(fromPos: RoomPosition, toPos: RoomPosition, opts: js.Object = ???): js.Array[PathStep] = js.native
+    def findPath(fromPos: RoomPosition, toPos: RoomPosition, opts: PathFinderOptions = js.native): js.Array[PathStep] = js.native
 
     /**
      * Creates a RoomPosition object at the specified location.
@@ -292,7 +266,7 @@ trait Room extends js.Object {
      * @return An array of objects of the given type at the specified position if found.
      * @note CPU Cost: LOW
      */
-    def lookForAt(lookType: String, x: Int, y: Int): js.Array[js.Object] = js.native
+    def lookForAt(lookType: String @@ Look, x: Int, y: Int): js.Array[js.Object] = js.native
 
     /**
      * Get the list of objects at the specified room position.
@@ -302,7 +276,7 @@ trait Room extends js.Object {
      * @return An array of objects of the given type at the specified position if found.
      * @note CPU Cost: LOW
      */
-    def lookForAt(lookType: String, target: RoomPosition): js.Array[js.Object] = js.native
+    def lookForAt(lookType: String @@ Look, target: RoomPosition): js.Array[js.Object] = js.native
 
     /**
      * Get the list of objects at the specified room area.
@@ -336,5 +310,5 @@ trait Room extends js.Object {
      *         ]}}}
      * @note CPU Cost: LOW
      */
-    def lookForAtArea(lookType: String, top: Int, left: Int, bottom: Int, right: Int, asArray: Boolean = false): js.Any = js.native
+    def lookForAtArea(lookType: String @@ Look, top: Int, left: Int, bottom: Int, right: Int, asArray: Boolean = false): js.Any = js.native
 }

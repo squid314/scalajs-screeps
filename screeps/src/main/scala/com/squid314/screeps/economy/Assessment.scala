@@ -16,45 +16,40 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
  * @param state    the broad strokes state.
  */
 @JSExportTopLevel("Assessment")
-case class Assessment(
-                         @JSExport age: Int,
-                         @JSExport reassess: Int,
-                         @JSExport state: Assessment.State.Value
-                     )
+class Assessment(
+                    @JSExport val age: Int,
+                    @JSExport val reassess: Int,
+                    @JSExport val state: Assessment.State.Value,
+                // TODO put needs in here, i think
+                //@JSExport val needs: js.Array[js.Object with js.Dynamic],
+                )
 
 object Assessment {
 
     object State extends Enumeration {
+        /** Represents a room just after [[StructureSpawn]] creation which has almost no resources. */
+        val Initializing = Value
         /** Represents a room in early stages. Probably just starting, may have collapsed. */
-        val Fledgling: Value = Value("Fledgling")
+        val Fledgling = Value
         /** Represents a room which may start farming adjacent rooms for energy and/or minerals. */
-        val Expanding: Value = Value("Expanding")
+        val Expanding = Value
         /** Resresents a room that is stable and may be working on combining minerals (or other stuff?). */
-        val Producing: Value = Value("Producing")
+        val Producing = Value
     }
 
     def apply(room: Room): Assessment = {
-        g.console.log("assessing room")
-        val existing = fromDynamic(room.memory)
+        fromDynamic(room.memory)
             .filter(a => a.reassess > Game.time)
-        if (existing.isDefined) {
-            g.console.log("using existing assessment")
-            existing.get
-        } else {
-            // TODO everything is "fledgling" right now
-/*
-            val filter: Structure => Boolean = (s: Structure) =>
-                s.structureType == StructureType.Spawn.name || s.structureType == StructureType.Extension.name
-            for (struct: Structure <- room.find(FindType.MyStructures,
-                /*ugh*/ js.Dynamic.literal(filter = filter))
-                .asInstanceOf[js.Array[Structure]]) {
+            .getOrElse {
+                for (cont <- room.controller) {
+                    if (cont.level < 3) {
+                        return new Assessment(Game.time, Game.time + 500, State.Initializing)
+                    }
+                }
+                val assessment = new Assessment(Game.time, Game.time + 1000, State.Fledgling)
+                room.memory.assessment = toDynamic(assessment)
+                assessment
             }
-*/
-
-            val assessment = new Assessment(Game.time, Game.time + 1000, State.Fledgling)
-            room.memory.assessment = toDynamic(assessment)
-            assessment
-        }
     }
 
     // these two defs are needed because we can't store a scala class into a js.Any object

@@ -206,7 +206,7 @@ class RoomPosition(val x: Int, val y: Int, val roomName: String) extends js.Obje
      *         var closest = creep.pos.findClosestByRange(targets);}}}
      */
     // TODO: Flesh out the opts type
-    def findClosestByRange[T <: js.Object](findType: Int @@ Find, opts: FindOptions[T] = js.native): UndefOr[js.Object] = js.native
+    def findClosestByRange[T <: js.Object](findType: Int @@ Find, opts: js.Object @@ FindOptions = js.native): UndefOr[js.Object] = js.native
 
     /**
      * Find an object with the shortest linear distance from the given position.
@@ -285,7 +285,7 @@ class RoomPosition(val x: Int, val y: Int, val roomName: String) extends js.Obje
      *         var closest = creep.pos.findInRange(targets, 3);}}}
      */
     // TODO: Flesh out the opts type
-    def findInRange[T <: js.Object](findType: Int, range: Int, opts: FindOptions[T] = js.native): js.Object = js.native
+    def findInRange[T <: js.Object](findType: Int, range: Int, opts: js.Object @@ FindOptions = js.native): js.Object = js.native
 
     /**
      * Find all objects in the specified linear range.
@@ -417,10 +417,18 @@ class RoomPosition(val x: Int, val y: Int, val roomName: String) extends js.Obje
     /**
      * Get linear range to the specified position.
      *
-     * @param target Can be a RoomPosition object or any object containing RoomPosition.
+     * @param target The destination
      * @return the number of squares to the given position
      */
     def getRangeTo(target: RoomPosition): Int = js.native
+
+    /**
+     * Get linear range to the specified position.
+     *
+     * @param target The destination
+     * @return the number of squares to the given position
+     */
+    def getRangeTo(target: RoomObject): Int = js.native
 
     /**
      * Check whether this position is in the given range of another position.

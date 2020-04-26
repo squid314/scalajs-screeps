@@ -12,76 +12,76 @@ import scala.reflect.macros.blackbox
 object Macros {
     def structureCached[T <: Structure]
     (
-        ext: UndefOr[T],
+        ext: UndefOr[Option[T]],
         structureType: StructureType.Value,
     )
-    : T = macro Impls.structureCached_Impl[T]
+    : Option[T] = macro Impls.structureCached_Impl[T]
 
     def structuresCached[T <: Structure]
     (
-        ext: UndefOr[js.Array[T]],
+        ext: UndefOr[List[T]],
         structureType: StructureType.Value,
     )
-    : js.Array[T] = macro Impls.structuresCached_Impl[T]
+    : List[T] = macro Impls.structuresCached_Impl[T]
 
     private object Impls {
         def structureCached_Impl[T <: Structure : c.WeakTypeTag]
         (c: blackbox.Context)
         (
-            ext: c.Expr[UndefOr[T]],
+            ext: c.Expr[UndefOr[Option[T]]],
             structureType: c.Expr[StructureType.Value],
         )
-        : c.Expr[T] = {
+        : c.Expr[Option[T]] = {
             import c.universe._
             val t = weakTypeOf[T]
             val tree = genCodeForStructureCache(c)(ext, structureType, t)(multiple = false)
-            c.Expr[T](tree)
+            c.Expr[Option[T]](tree)
         }
 
         def structuresCached_Impl[T <: Structure : c.WeakTypeTag]
         (c: blackbox.Context)
         (
-            ext: c.Expr[UndefOr[js.Array[T]]],
+            ext: c.Expr[UndefOr[List[T]]],
             structureType: c.Expr[StructureType.Value],
         )
-        : c.Expr[js.Array[T]] = {
+        : c.Expr[List[T]] = {
             import c.universe._
             val t = weakTypeOf[T]
             val tree = genCodeForStructureCache(c)(ext, structureType, t)(multiple = true)
-            c.Expr[js.Array[T]](tree)
+            c.Expr[List[T]](tree)
         }
 
         private def genCodeForStructureCache[T: c.WeakTypeTag](c: blackbox.Context)(ext: c.Expr[UndefOr[T]], structureType: c.Expr[Value], t: c.universe.Type)(multiple: Boolean) = {
             import c.universe._
             val q"""RoomOps.this.room.${TermName(s"_${memName}")}""" = ext.tree
-            val assignment =
-                if (multiple) q"""$ext = structures.asInstanceOf[UndefOr[js.Array[$t]]]"""
-                else q"""$ext = structures.headOption.asInstanceOf[UndefOr[$t]]"""
-            val cacheCast =
-                if (multiple) q"""materialized.asInstanceOf[UndefOr[js.Array[$t]]]"""
-                else q"""materialized.headOption.asInstanceOf[UndefOr[$t]]"""
+            val boxT =
+                if (multiple) tq"""List[$t]"""
+                else tq"""Option[$t]"""
+            val get =
+                if (multiple) q"""listStructures"""
+                else q"""listStructures.headOption"""
             q"""
-                if ($ext.isEmpty) {
-                    val cache = room.memory.selectDynamic($memName).asInstanceOf[UndefOr[StructureCache]]
-                            .getOrElse {
-                                val cache = new StructureCache()
-                                room.memory.updateDynamic($memName)(cache)
-                                cache
-                            }
-                    if (cache.maxAge > Game.time) {
-                        val materialized = cache.ids
-                            .flatMap(id => Game.getObjectById(id)
-                                .asInstanceOf[UndefOr[$t]].toOption)
-                        $ext = $cacheCast
-                    } else {
-                        val filter = ((s: Structure) => s.structureType == $structureType).asInstanceOf[js.Object => Boolean]
-                        val structures = room.find(Find.Structures, FindOptions(filter)).asInstanceOf[js.Array[$t]]
-                        room.memory.updateDynamic($memName)(new StructureCache(Game.time + Config.maxStructureCache, structures.map(_.id)))
-                        $assignment
-                    }
-                }
-                $ext.get
-                """
+                $ext.getOrElse(
+                    room.memory.selectDynamic($memName).asInstanceOf[UndefOr[StructureCache]]
+                        .toOption
+                        .filter(_.maxAge <= Game.time)
+                        .map(_.ids)
+                        .map(List.from(_))
+                        .map(ids => {
+                            val listStructures = ids.flatMap(Game.getObjectById(_).asInstanceOf[UndefOr[$t]].toOption)
+                            $ext = $get.asInstanceOf[UndefOr[$boxT]]
+                            $get
+                        })
+                        .getOrElse({
+                            val filter: scala.scalajs.js.Function1[Structure, Boolean] = (s: Structure) => s.structureType == $structureType.name
+                            val structures = room.find(Find.Structures, FindOptions(filter)).asInstanceOf[js.Array[$t]]
+                            room.memory.updateDynamic($memName)(StructureCache(Game.time + com.squid314.screeps.Config.maxStructureCache, structures.map(_.id)))
+                            val listStructures = List.from(structures)
+                            $ext = $get.asInstanceOf[UndefOr[$boxT]]
+                            $get
+                        })
+                )
+               """
         }
     }
 

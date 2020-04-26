@@ -1,12 +1,12 @@
 package com.squid314.screeps
 
 import language.implicitConversions
-
 import com.screeps.native.Constants._
 import com.screeps.native._
-import com.squid314.screeps.economy.Assessment
-import com.squid314.screeps.roles.{Miner, Role, Upgrader}
-import com.squid314.screeps.proto.RoomOps
+import com.squid314.screeps.economy.{Assessment, Need, RoleNeed}
+import com.squid314.screeps.economy.Assessment.State._
+import com.squid314.screeps.roles._
+import com.squid314.screeps.proto._
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
@@ -19,28 +19,38 @@ object Screeps {
         memoryMaintenance() // maybe this will become uncommon at some point
         executeUncommonTasks()
 
-        g.console.log(s"time: ${Game.time}")
+        println(s"time: ${Game.time}")
 
         val origin = Game.rooms.values.head.getPositionAt(1, 2)
-        PathFinder.search(origin,
-            RangeGoal(Game.spawns.values.head, 3),
-            new PathFinderOpts(
-                swampCost = Some(9),
-                maxOps = Some(400),
-            ))
+        //        PathFinder.search(origin,
+        //            RangeGoal(Game.spawns.values.head, 3),
+        //            PathFinderOptions()
+        //                .withSwampCost(9)
+        //                .withMaxOps(400))
 
         for (room <- Game.spawns.values.toList.map(_.room).distinct) {
-            //            val a = Assessment(room)
-            //            if (a.state == Fledgling)
-            println(s"sources: ${room.sources()}")
-            println(s"keepers: ${room.keepers()}")
+            val a = Assessment(room)
+            val needs: List[Need] = a.state match {
+                case Initializing =>
+                    //val needs = "miner" :: "miner" :: "miner" :: "miner" :: Nil
+                    // this is kind of hacky, i think, but whatever
+                    val needs =
+                        RoleNeed("miner",List(Bodypart.Work, Bodypart.Work, Bodypart.Move), "miner1") ::
+                        RoleNeed("miner",List(Bodypart.Work, Bodypart.Work, Bodypart.Move), "miner1") ::
+                        Nil
+                    needs
+                case Fledgling =>
+                    val needs = List()
+                    needs
+                case Expanding => ???
+                case Producing => ???
+            }
+            println(s"room.minerals: ${room.minerals}")
+            println(s"room.spawns: ${room.spawns}")
         }
 
-        for ((name, creep) <- Game.creeps) {
-            if (creep.spawning)
-                g.console.log(s"creep: $name -> $creep: spawning")
-            else {
-                g.console.log(s"creep: $name -> $creep: ${creep.ticksToLive}")
+        for ((_, creep) <- Game.creeps) {
+            if (!creep.spawning) {
                 for (role <- creep.memory.role.asInstanceOf[UndefOr[String]]) {
                     roles.get(role)
                         .foreach(_.run(creep))
@@ -64,6 +74,8 @@ object Screeps {
     val roles: js.Dictionary[Role] = js.Dictionary(
         "miner" -> Miner,
         "upgrader" -> Upgrader,
+        "builder" -> Builder,
+        "ups" -> Ups,
     )
 
     def repairScan(): Unit = {

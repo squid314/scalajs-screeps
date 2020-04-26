@@ -1,5 +1,7 @@
 package com.screeps.native
 
+import com.screeps.native.Constants._
+
 import scala.scalajs.js
 
 /**
@@ -13,9 +15,9 @@ import scala.scalajs.js
 @js.native
 trait Source extends RoomObject {
     /** The remaining amount of energy. */
-    val energy: Int = js.native
+    val energy: Int @@ ResourceAmount = js.native
     /** The total amount of energy in the source. */
-    val energyCapacity: Int = js.native
+    val energyCapacity: Int @@ ResourceAmount = js.native
     /** A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id. */
     val id: String = js.native
     /** The remaining time after which the source will be refilled. */

@@ -14,7 +14,6 @@ trait Tagging {
 
 object Constants extends Tagging {
     sealed trait ResourceAmount // tagging trait
-    sealed trait Ticks
 
     sealed trait Direction
     object Direction extends Enumeration {
@@ -87,7 +86,7 @@ object Constants extends Tagging {
         val Storage     = Val("storage",         30_000)
         val Tower       = Val("tower",           5_000)
         val Observer    = Val("observer",        8_000)
-        val PowerBank   = Val("powerBankPowerBank")
+        val PowerBank   = Val("powerBank")
         val PowerSpawn  = Val("powerSpawn",      100_000)
         val Extractor   = Val("extractor",       5_000)
         val Lab         = Val("lab",             50_000)
@@ -125,7 +124,6 @@ object Constants extends Tagging {
     object Bodypart extends Enumeration {
         private implicit def tagName(s: String): String @@ Bodypart = tag[Bodypart](s)
         private implicit def tagCost(i: Int): Int @@ ResourceAmount = tag[ResourceAmount](i)
-        private implicit def tagTicks(i: Int): Int = tag[Ticks](i)
         type Value = Val
         protected case class Val(name: String @@ Bodypart, cost: Int @@ ResourceAmount, maxLifetime: Int = 1500) extends super.Val(name)
         val Move          = Val("move", 50)
