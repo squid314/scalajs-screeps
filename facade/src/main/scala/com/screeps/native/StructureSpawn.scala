@@ -68,7 +68,7 @@ trait StructureSpawn extends OwnedStructureWithStorage {
      * If the spawn is in process of spawning a new creep, this object
      * will contain the new creep’s information, or null otherwise.
      */
-    val spawning: UndefOr[Spawning] = js.native
+    val spawning: Spawning = js.native
 
     /**
      * Start the creep spawning process. The required energy amount can be withdrawn from all spawns and extensions in the room.

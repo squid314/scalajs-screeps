@@ -15,14 +15,14 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
  * @param reassess the [[Game.time]] at (or after) which to examine the state of the room again.
  * @param state    the broad strokes state.
  */
-@JSExportTopLevel("Assessment")
-class Assessment(
-                    @JSExport val age: Int,
-                    @JSExport val reassess: Int,
-                    @JSExport val state: Assessment.State.Value,
-                // TODO put needs in here, i think
-                //@JSExport val needs: js.Array[js.Object with js.Dynamic],
-                )
+case class Assessment(
+                         age: Int,
+                         reassess: Int,
+                         state: Assessment.State.Value,
+//                         roleNeeds: List[RoleNeed],
+                         // TODO put needs in here, i think
+                         //@JSExport val needs: js.Array[js.Object with js.Dynamic],
+                     )
 
 object Assessment {
 
@@ -37,16 +37,16 @@ object Assessment {
         val Producing = Value
     }
 
-    def apply(room: Room): Assessment = {
+    def assess(room: Room): Assessment = {
         fromDynamic(room.memory)
             .filter(a => a.reassess > Game.time)
             .getOrElse {
                 for (cont <- room.controller) {
                     if (cont.level < 3) {
-                        return new Assessment(Game.time, Game.time + 500, State.Initializing)
+                        return Assessment(Game.time, Game.time + 500, State.Initializing)
                     }
                 }
-                val assessment = new Assessment(Game.time, Game.time + 1000, State.Fledgling)
+                val assessment = Assessment(Game.time, Game.time + 1000, State.Fledgling)
                 room.memory.assessment = toDynamic(assessment)
                 assessment
             }
@@ -54,7 +54,11 @@ object Assessment {
 
     // these two defs are needed because we can't store a scala class into a js.Any object
     private def toDynamic(a: Assessment): js.Dynamic =
-        js.Dynamic.literal(age = a.age, reassess = a.reassess, state = a.state.toString)
+        js.Dynamic.literal(
+            age = a.age,
+            reassess = a.reassess,
+            state = a.state.toString,
+        )
 
     private def fromDynamic(memory: js.Dynamic): Option[Assessment] =
         for {
@@ -63,5 +67,6 @@ object Assessment {
             reassess <- d.reassess.asInstanceOf[UndefOr[Int]].toOption
             stateName <- d.state.asInstanceOf[UndefOr[String]].toOption
             state <- State.values.find(_.toString == stateName)
+//            roleNeeds <- d.roleNeeds.asInstanceOf[UndefOr[]]
         } yield new Assessment(age, reassess, state)
 }

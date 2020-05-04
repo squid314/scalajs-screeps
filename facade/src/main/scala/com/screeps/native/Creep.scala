@@ -645,5 +645,68 @@ trait Creep extends RoomObject {
      *         InvalidArgs - The resource amount or type is incorrect
      * @note CPU Cost: CONST
      */
-    def withdraw(target: Structure, resourceType: String, amount: Int = js.native): Int @@ Error = js.native
+    def withdraw(target: Structure, resourceType: String): Int @@ Error = js.native
+
+    /**
+     * Withdraw resources from a structure. The target has to be at adjacent square to the creep. Multiple creeps can
+     * withdraw from the same structure in the same tick. Your creeps can withdraw resources from hostile structures
+     * as well, in case if there is no hostile rampart on top of it.
+     *
+     * @param target       The target object.
+     * @param resourceType One of the RESOURCE_* constants.
+     * @param amount       The amount of resources to be transferred. If omitted, all the available carried amount is used.
+     * @return One of the following codes:
+     *         OK - The operation has been scheduled successfully.
+     *         NotOwner - You are not the owner of this creep.
+     *         Busy - The creep is still being spawned.
+     *         NotEnoughResources - The target does not have the given amount of resources.
+     *         InvalidTarget - The target is not a valid object which can contain the specified resource.
+     *         Full - The creep's carry is full.
+     *         NotInRange - The target is too far away.
+     *         InvalidArgs - The resource amount or type is incorrect
+     * @note CPU Cost: CONST
+     */
+    def withdraw(target: Structure, resourceType: String, amount: Int): Int @@ Error = js.native
+
+    /**
+     * Withdraw resources from a structure. The target has to be at adjacent square to the creep. Multiple creeps can
+     * withdraw from the same structure in the same tick. Your creeps can withdraw resources from hostile structures
+     * as well, in case if there is no hostile rampart on top of it.
+     *
+     * @param target       The target object.
+     * @param resourceType One of the RESOURCE_* constants.
+     * @param amount       The amount of resources to be transferred. If omitted, all the available carried amount is used.
+     * @return One of the following codes:
+     *         OK - The operation has been scheduled successfully.
+     *         NotOwner - You are not the owner of this creep.
+     *         Busy - The creep is still being spawned.
+     *         NotEnoughResources - The target does not have the given amount of resources.
+     *         InvalidTarget - The target is not a valid object which can contain the specified resource.
+     *         Full - The creep's carry is full.
+     *         NotInRange - The target is too far away.
+     *         InvalidArgs - The resource amount or type is incorrect
+     * @note CPU Cost: CONST
+     */
+    def withdraw(target: Tombstone, resourceType: String): Int @@ Error = js.native
+
+    /**
+     * Withdraw resources from a structure. The target has to be at adjacent square to the creep. Multiple creeps can
+     * withdraw from the same structure in the same tick. Your creeps can withdraw resources from hostile structures
+     * as well, in case if there is no hostile rampart on top of it.
+     *
+     * @param target       The target object.
+     * @param resourceType One of the RESOURCE_* constants.
+     * @param amount       The amount of resources to be transferred. If omitted, all the available carried amount is used.
+     * @return One of the following codes:
+     *         OK - The operation has been scheduled successfully.
+     *         NotOwner - You are not the owner of this creep.
+     *         Busy - The creep is still being spawned.
+     *         NotEnoughResources - The target does not have the given amount of resources.
+     *         InvalidTarget - The target is not a valid object which can contain the specified resource.
+     *         Full - The creep's carry is full.
+     *         NotInRange - The target is too far away.
+     *         InvalidArgs - The resource amount or type is incorrect
+     * @note CPU Cost: CONST
+     */
+    def withdraw(target: Tombstone, resourceType: String, amount: Int): Int @@ Error = js.native
 }

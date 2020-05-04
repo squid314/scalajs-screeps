@@ -310,5 +310,22 @@ trait Room extends js.Object {
      *         ]}}}
      * @note CPU Cost: LOW
      */
-    def lookForAtArea(lookType: String @@ Look, top: Int, left: Int, bottom: Int, right: Int, asArray: Boolean = false): js.Any = js.native
+    def lookForAtArea(lookType: String @@ Look, top: Int, left: Int, bottom: Int, right: Int, asArray: Boolean = false):
+    js.Array[LookArrayResult] |
+    LookObjectResult = js.native
+}
+
+@js.native
+@JSGlobal
+class LookArrayResult extends js.Object {
+    val x: Int = js.native
+    val y: Int = js.native
+    val structure: js.Dynamic = js.native
+    // TODO determine what this structure is
+}
+
+@js.native
+@JSGlobal
+class LookObjectResult extends js.Object {
+    // TODO do i even really care?
 }

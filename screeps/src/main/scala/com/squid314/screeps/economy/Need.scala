@@ -8,6 +8,7 @@ import scala.scalajs.js.JSConverters._
 
 sealed trait Need {
     def `type`: Int @@ Need
+    def id: String
 }
 
 object Need {
@@ -40,6 +41,7 @@ case class RoleNeed(
                        roleName: String,
                        body: List[String @@ Bodypart],
                        id: String,
+                       otherMem: js.Dynamic = js.Dynamic.literal()
                    ) extends Need {
     override def `type` = Need.Role
 }

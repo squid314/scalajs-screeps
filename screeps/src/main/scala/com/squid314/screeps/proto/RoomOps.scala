@@ -2,6 +2,7 @@ package com.squid314.screeps.proto
 
 import com.screeps.native.Constants._
 import com.screeps.native._
+import com.squid314.screeps.Config
 import com.squid314.screeps.macros.Macros
 
 import scala.language.experimental.macros
@@ -11,6 +12,52 @@ import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 final class RoomOps(r: Room) {
     private val room = r.asInstanceOf[RoomExtension]
+
+    /** Alias for [[Room.lookForAtArea()]] with `asArray = true` */
+    def lookForAtAreaArray(lookType: String @@ Look, top: Int, left: Int, bottom: Int, right: Int)
+    : List[LookArrayResult] =
+        List.from(room.lookForAtArea(lookType, top, left, bottom, right, asArray = true)
+            .asInstanceOf[js.Array[LookArrayResult]])
+
+    def repairs: List[Structure] =
+        room._repairs.getOrElse({
+            room.memory.repairs.asInstanceOf[UndefOr[StructureCache]]
+                .toOption
+                .filter(Game.time <= _.maxAge)
+                .map(_.ids)
+                .map(List.from(_))
+                .map(ids => {
+                    val listStructures = ids.flatMap(Game.getObjectById(_).asInstanceOf[UndefOr[Structure]].toOption)
+                    room._repairs = listStructures.asInstanceOf[UndefOr[List[Structure]]]
+                    listStructures
+                })
+                .getOrElse({
+                    val structures = room.find(Find.Structures).asInstanceOf[js.Array[Structure]]
+                        .filterNot(_.structureType == StructureType.Controller.name)
+                        .filter(s =>
+                            if (walls.contains(s.structureType)) s.hits < wallTarget * 3 / 4
+                            else s.hits < s.hitsMax * 3 / 4)
+                    println(s"scanning repairs: ${structures.size} -> ${structures.take(2)}...")
+                    room.memory.repairs = StructureCache(Game.time + Config.repairCache, structures.map(_.id))
+                    val listStructures = List.from(structures)
+                    room._repairs = listStructures.asInstanceOf[UndefOr[List[Structure]]]
+                    listStructures
+                })
+        })
+
+    def finishRepair(structure: Structure): Unit = {
+        room._repairs
+            .map(r => r.filterNot(_.id == structure.id))
+            .map(r => room._repairs = r.asInstanceOf[UndefOr[List[Structure]]])
+            .getOrElse(())
+        room.memory.repairs.asInstanceOf[UndefOr[StructureCache]]
+            .map(c => StructureCache(c.maxAge, c.ids.filterNot(_ == structure.id)))
+            .map(r => room.memory.repairs = r)
+            .getOrElse(())
+    }
+
+    val walls: List[String @@ StructureType] = List(StructureType.Wall, StructureType.Rampart)
+    val wallTarget: Int = 100_000 // TODO this should become based on room assessment
 
     def sources: List[Source] =
         room._sources.getOrElse(
@@ -95,6 +142,7 @@ trait RoomExtension extends Room {
     var _towers: UndefOr[List[StructureTower]] = js.native
     var _nuker: UndefOr[Option[StructureNuker]] = js.native
     var _observer: UndefOr[Option[StructureObserver]] = js.native
+    var _repairs: UndefOr[List[Structure]] = js.native
 }
 
 /**

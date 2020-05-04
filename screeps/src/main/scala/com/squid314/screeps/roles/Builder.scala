@@ -5,14 +5,16 @@ import com.screeps.native.Constants._
 
 import scala.scalajs.js
 import com.squid314.screeps.ext._
+import com.squid314.screeps.proto._
+import com.squid314.screeps.util.Util
 
 import scala.scalajs.js.Dynamic.literal
 
 object Builder extends ToggleEnergyWorker {
-    def work(creep: Creep): Unit = {
-        if (!(attemptBuild(creep)))
-            Upgrader.work(creep)
-    }
+    def work(creep: Creep): Unit =
+        if (!attemptRepair(creep))
+            if (!attemptBuild(creep))
+                Upgrader.work(creep)
 
     def checkMemorizedWork(creep: Creep): Boolean = ???
 
@@ -35,6 +37,21 @@ object Builder extends ToggleEnergyWorker {
             })
             .headOption
             .getOrElse(false)
+
+
+    def attemptRepair(creep: Creep): Boolean =
+        creep.room.repairs
+            .filter(s => s.hits < s.hitsMax)
+            .minByOption(creep.pos.getRangeTo)
+            .exists(s => {
+                val err = creep.repair(s)
+                if (err == Error.OK.id) true
+                else if (err == Error.NotInRange.id) {
+                    creep.travelTo(s.pos)
+                    true
+                }
+                else false
+            })
 
     /*
         def attemptRepair(creep: Creep): Boolean = {

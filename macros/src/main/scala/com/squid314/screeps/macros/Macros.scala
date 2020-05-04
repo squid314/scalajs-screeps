@@ -64,7 +64,7 @@ object Macros {
                 $ext.getOrElse(
                     room.memory.selectDynamic($memName).asInstanceOf[UndefOr[StructureCache]]
                         .toOption
-                        .filter(_.maxAge <= Game.time)
+                        .filter(Game.time <= _.maxAge)
                         .map(_.ids)
                         .map(List.from(_))
                         .map(ids => {

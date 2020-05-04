@@ -3,7 +3,7 @@ import sbt.Keys._
 lazy val common = Seq(
     organization := "com.squid314",
     version := "0.0.2",
-    scalaVersion := "2.13.1",
+    scalaVersion := "2.13.2",
     //scalaVersion := "0.23.0", // dotty compiler; doesn't work with scala.js yet
     scalacOptions ++= Seq("-deprecation", "-feature", "-Xfatal-warnings"),
     homepage := Some(url("https://github.com/squid314/scalajs-screeps")),
